@@ -1,3 +1,18 @@
+// GIVEN a note-taking application
+// WHEN I open the Note Taker
+// THEN I am presented with a landing page with a link to a notes page
+// WHEN I click on the link to the notes page
+// THEN I am presented with a page with existing notes listed in the left-hand column, plus empty fields to enter a new note title and the note’s text in the right-hand column
+// WHEN I enter a new note title and the note’s text
+// THEN a Save icon appears in the navigation at the top of the page
+// WHEN I click on the Save icon
+// THEN the new note I have entered is saved and appears in the left-hand column with the other existing notes
+// WHEN I click on an existing note in the list in the left-hand column
+// THEN that note appears in the right-hand column
+// WHEN I click on the Write icon in the navigation at the top of the page
+// THEN I am presented with empty fields to enter a new note title and the note’s text in the right-hand column
+const fs = require('fs');
+
 let noteTitle;
 let noteText;
 let saveNoteBtn;
@@ -22,19 +37,27 @@ const hide = (elem) => {
   elem.style.display = 'none';
 };
 
+
+
+
+
+
+
+
 // activeNote is used to keep track of the note in the textarea
 let activeNote = {};
-
+console.log(activeNote);
+// gets note from server
 const getNotes = () =>
-  fetch('/api/notes', {
+  fetch('/db.json', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   });
-
+// save new note
 const saveNote = (note) =>
-  fetch('/api/notes', {
+  fetch('db.json', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -179,5 +202,19 @@ if (window.location.pathname === '/notes') {
   noteTitle.addEventListener('keyup', handleRenderSaveBtn);
   noteText.addEventListener('keyup', handleRenderSaveBtn);
 }
+// Read the db.json file
+fs.readFile('db.json', 'utf8', (err, data) => {
+  if (err) throw err;
 
+  // Parse the file contents into a JavaScript object
+  const notes = data;
+
+  // Push the activeNote object into the notes array
+  notes.push(activeNote);
+
+  // Write the updated object back to the db.json file
+  fs.writeFile('db.json', JSON.stringify(notes), (err) => {
+    if (err) throw err;
+  });
+});
 getAndRenderNotes();
