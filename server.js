@@ -24,14 +24,15 @@ app.get("*", (req, res) => {
 
 function addNewNote(body, notesArray) {
   const newNote = body;
-  if (!Array.isArray(notesArray)) notesArray = [];
 
-  if (notesArray.length === 0) notesArray.push(0);
+  if (notesArray.length === 0) {
+    notesArray.push(0);
+  }
 
-  body.id = notesArray[0];
+  newNote.id = notesArray[0];
   notesArray[0]++;
-
   notesArray.push(newNote);
+
   fs.writeFileSync(path.join(__dirname, "./db/db.json"), JSON.stringify(notesArray, null, 2));
   return newNote;
 }
@@ -42,16 +43,8 @@ app.post("/api/notes", (req, res) => {
 });
 
 function deleteNote(id, notesArray) {
-  for (let i = 0; i < notesArray.length; i++) {
-    let note = notesArray[i];
-
-    if (note.id == id) {
-      notesArray.splice(i, 1);
-      fs.writeFileSync(path.join(__dirname, "./db/db.json"), JSON.stringify(notesArray, null, 2));
-
-      break;
-    }
-  }
+  const filteredArray = notesArray.filter(note => note.id != id);
+  fs.writeFileSync(path.join(__dirname, "./db/db.json"), JSON.stringify(filteredArray, null, 2));
 }
 
 app.delete("/api/notes/:id", (req, res) => {
