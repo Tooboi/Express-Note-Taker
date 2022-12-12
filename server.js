@@ -1,38 +1,61 @@
 const express = require("express");
 const path = require("path");
-const db = require('./db/db.json');
-const fs = require('fs');
-
+const db = require("./db/db.json");
+const fs = require("fs");
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(express.static("public"));
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public/index.html")));
 
 app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
 
-app.post('/notes', (req, res) => {
-    // let request;
-    // request = {
-    //     title: 'success',
-    //     text: req.body,
-    //   };
-    //   console.log(request);
-    //   res.send(request);
-    console.log(req.body);
-      if (req.body) {
-        response = {
-          noteID: 'success',
-          data: req.body,
-        };
-        res.status(201).json(response);
-      } else {
-        res.status(400).json('Request body must at least contain a product name');
-      }
-})
+app.get("/api/notes", (req, res) => {
+  res.json(db.slice(1));
+});
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
+});
+
+function addNewNote(body, notesArray) {
+  const newNote = body;
+  if (!Array.isArray(notesArray)) notesArray = [];
+
+  if (notesArray.length === 0) notesArray.push(0);
+
+  body.id = notesArray[0];
+  notesArray[0]++;
+
+  notesArray.push(newNote);
+  fs.writeFileSync(path.join(__dirname, "./db/db.json"), JSON.stringify(notesArray, null, 2));
+  return newNote;
+}
+
+app.post("/api/notes", (req, res) => {
+  const newNote = addNewNote(req.body, db);
+  res.json(newNote);
+});
+
+function deleteNote(id, notesArray) {
+  for (let i = 0; i < notesArray.length; i++) {
+    let note = notesArray[i];
+
+    if (note.id == id) {
+      notesArray.splice(i, 1);
+      fs.writeFileSync(path.join(__dirname, "./db/db.json"), JSON.stringify(notesArray, null, 2));
+
+      break;
+    }
+  }
+}
+
+app.delete("/api/notes/:id", (req, res) => {
+  deleteNote(req.params.id, db);
+  res.json(true);
+});
 app.listen(PORT, () => console.log(`Example app listening at http://localhost:${PORT}`));

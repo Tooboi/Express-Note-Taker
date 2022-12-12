@@ -11,7 +11,6 @@
 // THEN that note appears in the right-hand column
 // WHEN I click on the Write icon in the navigation at the top of the page
 // THEN I am presented with empty fields to enter a new note title and the note’s text in the right-hand column
-const fs = require('fs');
 
 let noteTitle;
 let noteText;
@@ -37,19 +36,12 @@ const hide = (elem) => {
   elem.style.display = 'none';
 };
 
-
-
-
-
-
-
-
 // activeNote is used to keep track of the note in the textarea
 let activeNote = {};
-console.log(activeNote);
+
 // gets note from server
 const getNotes = () =>
-  fetch('/db.json', {
+  fetch('/api/notes', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -57,7 +49,7 @@ const getNotes = () =>
   });
 // save new note
 const saveNote = (note) =>
-  fetch('db.json', {
+  fetch('/api/notes', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -202,19 +194,5 @@ if (window.location.pathname === '/notes') {
   noteTitle.addEventListener('keyup', handleRenderSaveBtn);
   noteText.addEventListener('keyup', handleRenderSaveBtn);
 }
-// Read the db.json file
-fs.readFile('db.json', 'utf8', (err, data) => {
-  if (err) throw err;
 
-  // Parse the file contents into a JavaScript object
-  const notes = data;
-
-  // Push the activeNote object into the notes array
-  notes.push(activeNote);
-
-  // Write the updated object back to the db.json file
-  fs.writeFile('db.json', JSON.stringify(notes), (err) => {
-    if (err) throw err;
-  });
-});
 getAndRenderNotes();
