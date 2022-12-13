@@ -11,6 +11,7 @@
 // THEN that note appears in the right-hand column
 // WHEN I click on the Write icon in the navigation at the top of the page
 // THEN I am presented with empty fields to enter a new note title and the note’s text in the right-hand column
+const uuid = require('../../../helpers/uuid');
 
 let noteTitle;
 let noteText;
@@ -98,7 +99,7 @@ const handleNoteDelete = (e) => {
   e.stopPropagation();
 
   const note = e.target;
-  const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
+  const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).uuid;
 
   if (activeNote.id === noteId) {
     activeNote = {};
